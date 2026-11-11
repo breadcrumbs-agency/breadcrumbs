@@ -17,7 +17,7 @@ Each repository holds one commit with no parent. Its tree is equal to the folder
 
 | Part | Baseline commit | Python lines (no tests) | Tests, run alone |
 |---|---|---:|---|
-| breadcrumbs-common | `777fb9fc` | 5,369 | 158, OK |
+| breadcrumbs-common | `777fb9fc` | 5,369 | 158, OK (162 after step 5 below) |
 | breadcrumbs-spacegraph | `614ea6d9` | 5,515 | 7, OK |
 | breadcrumbs-hermes | `8023b55c` | 6,594 | 928, OK (19 skipped) |
 | breadcrumbs-claude | `bdfa02c0` | 11 | 5, OK |
@@ -34,6 +34,10 @@ Each repository holds one commit with no parent. Its tree is equal to the folder
 2. `d51e070`: issue #1, first part: one writer for the hide file, with a lock.
 3. `a3ca8dd`: common got its own reader and its own `find`. Each layer gives its ports from one adapter.
 4. `c4af2f3`: the files moved into seven folders, one package each.
+5. `4da1fb4`: one harness contract in common. One `config` reader; `ports.mcp_add` for the setup line of three
+   adapters; one shared test case for an adapter (`breadcrumbs/harness_case.py`); one session ingest
+   (`ingest.ingest_sessions`) that a harness feeds with a source; the command `ingest HARNESS [PATH]`.
+   The measure of repeated code (functions with an equal body, blocks of 8 equal lines) went from 1 to 0.
 
 The help text of 41 command forms is byte-equal before and after. A run on a seeded store gave equal results.
 
@@ -52,8 +56,8 @@ The help text of 41 command forms is byte-equal before and after. A run on a see
 
 | Work | Part | State |
 |---|---|---|
-| DRY: one harness contract, one shared adapter test, one session ingest | common, then each adapter | dispatched 2026-11-11 |
-| Ports: read the sessions of Claude Code, Codex, OpenCode (Grok when its format is documented) | claude, codex, opencode, grok | dispatched 2026-11-11, after the DRY step |
+| DRY: one harness contract, one shared adapter test, one session ingest | common, then each adapter | done (`4da1fb4`) |
+| Ports: read the sessions of Claude Code, Codex, OpenCode (Grok when its format is documented) | claude, codex, opencode, grok | in work since 2026-11-11 15:16 CST |
 | Issue #1: agent tools for hide, unhide, remove, rehome; retract | common | first commit is in (`d51e070`) |
 | Issue #1: the right-click menu | spacegraph | open |
 | Links (issue, PR, commit, card) as cost centers, with open and close marks | common, spacegraph | design only |
@@ -66,3 +70,4 @@ The help text of 41 command forms is byte-equal before and after. A run on a see
 - 2026-11-11 14:39 CST: the split is done on `refactor/layers` (`c4af2f3`).
 - 2026-11-11 14:53 CST: the seven repositories were created, private, one commit each.
 - 2026-11-11 15:10 CST: this repository links them.
+- 2026-11-11 15:25 CST: step 5 (`4da1fb4`) went to common, hermes, claude, codex, opencode and grok. The seven suites passed alone on that commit.
