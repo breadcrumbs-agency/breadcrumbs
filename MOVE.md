@@ -60,7 +60,7 @@ The help text of 41 command forms is byte-equal before and after. A run on a see
 | Work | Part | State |
 |---|---|---|
 | DRY: one harness contract, one shared adapter test, one session ingest | common, then each adapter | done (`4da1fb4`) |
-| Ports: read the sessions of Claude Code, Codex, OpenCode | claude, codex, opencode | done (`a7ebcf2`). Claude Code and Codex: one real session file each was read into a scratch store. OpenCode: built from its source at v1.18.30; no real database was available to test |
+| Ports: read the sessions of Claude Code, Codex, OpenCode | claude, codex, opencode | done (`a7ebcf2`). Claude Code and Codex: one real session file each was read into a scratch store. OpenCode: built from its source at v1.18.30; a real database (5 sessions, 8 messages, made by OpenCode 1.18.30 on NVIDIA Nemotron) was read into a scratch store on 2026-11-11, and a second run added no session |
 | Port: read the sessions of Grok CLI | grok | open. The xAI documents name the folder `~/.grok/sessions/` and no file format. The part only names the harness and prints the setup line |
 | Issue #1: agent tools for hide, unhide, remove, rehome; retract | common | first commit is in (`d51e070`) |
 | Issue #1: the right-click menu | spacegraph | open |
@@ -76,3 +76,4 @@ The help text of 41 command forms is byte-equal before and after. A run on a see
 - 2026-11-11 15:10 CST: this repository links them.
 - 2026-11-11 15:25 CST: step 5 (`4da1fb4`) went to common, hermes, claude, codex, opencode and grok. The seven suites passed alone on that commit.
 - 2026-11-11 15:35 CST: step 6 (`a7ebcf2`) went to common, claude, codex and opencode. The seven suites passed alone on that commit: 162, 7, 928 (19 skipped), 9, 9, 9, 5.
+- 2026-11-11 16:40 CST: OpenCode on this Mac now uses NVIDIA Nemotron (`nemotron-3-ultra-550b-a55b`; small model `nemotron-3.5-lightning-30b-a3b`). Its first sessions gave the OpenCode port its real proof.
