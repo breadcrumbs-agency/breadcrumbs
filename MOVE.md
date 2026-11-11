@@ -38,6 +38,9 @@ Each repository holds one commit with no parent. Its tree is equal to the folder
    adapters; one shared test case for an adapter (`breadcrumbs/harness_case.py`); one session ingest
    (`ingest.ingest_sessions`) that a harness feeds with a source; the command `ingest HARNESS [PATH]`.
    The measure of repeated code (functions with an equal body, blocks of 8 equal lines) went from 1 to 0.
+6. `cb58a4d`, `6ae5aae`, `6299733`, `a7ebcf2`: the ports. Claude Code, Codex and OpenCode each give a session source
+   (`sessions.py`) to the one ingest of common. What two sources share is in common (`breadcrumbs/transcript.py`).
+   The measure of repeated code stays 0.
 
 The help text of 41 command forms is byte-equal before and after. A run on a seeded store gave equal results.
 
@@ -57,7 +60,8 @@ The help text of 41 command forms is byte-equal before and after. A run on a see
 | Work | Part | State |
 |---|---|---|
 | DRY: one harness contract, one shared adapter test, one session ingest | common, then each adapter | done (`4da1fb4`) |
-| Ports: read the sessions of Claude Code, Codex, OpenCode (Grok when its format is documented) | claude, codex, opencode, grok | in work since 2026-11-11 15:16 CST |
+| Ports: read the sessions of Claude Code, Codex, OpenCode | claude, codex, opencode | done (`a7ebcf2`). Claude Code and Codex: one real session file each was read into a scratch store. OpenCode: built from its source at v1.18.30; no real database was available to test |
+| Port: read the sessions of Grok CLI | grok | open. The xAI documents name the folder `~/.grok/sessions/` and no file format. The part only names the harness and prints the setup line |
 | Issue #1: agent tools for hide, unhide, remove, rehome; retract | common | first commit is in (`d51e070`) |
 | Issue #1: the right-click menu | spacegraph | open |
 | Links (issue, PR, commit, card) as cost centers, with open and close marks | common, spacegraph | design only |
@@ -71,3 +75,4 @@ The help text of 41 command forms is byte-equal before and after. A run on a see
 - 2026-11-11 14:53 CST: the seven repositories were created, private, one commit each.
 - 2026-11-11 15:10 CST: this repository links them.
 - 2026-11-11 15:25 CST: step 5 (`4da1fb4`) went to common, hermes, claude, codex, opencode and grok. The seven suites passed alone on that commit.
+- 2026-11-11 15:35 CST: step 6 (`a7ebcf2`) went to common, claude, codex and opencode. The seven suites passed alone on that commit: 162, 7, 928 (19 skipped), 9, 9, 9, 5.
