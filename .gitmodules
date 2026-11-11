@@ -1,0 +1,21 @@
+[submodule "breadcrumbs-common"]
+	path = breadcrumbs-common
+	url = ../breadcrumbs-common.git
+[submodule "breadcrumbs-spacegraph"]
+	path = breadcrumbs-spacegraph
+	url = ../breadcrumbs-spacegraph.git
+[submodule "breadcrumbs-hermes"]
+	path = breadcrumbs-hermes
+	url = ../breadcrumbs-hermes.git
+[submodule "breadcrumbs-claude"]
+	path = breadcrumbs-claude
+	url = ../breadcrumbs-claude.git
+[submodule "breadcrumbs-codex"]
+	path = breadcrumbs-codex
+	url = ../breadcrumbs-codex.git
+[submodule "breadcrumbs-opencode"]
+	path = breadcrumbs-opencode
+	url = ../breadcrumbs-opencode.git
+[submodule "breadcrumbs-grok"]
+	path = breadcrumbs-grok
+	url = ../breadcrumbs-grok.git
