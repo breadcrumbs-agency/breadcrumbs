@@ -45,6 +45,10 @@ Each repository holds one commit with no parent. Its tree is equal to the folder
    as a ratio of sums. The LLM cache metrics are defined once (`breadcrumbs/usage.py`): hit share, write share, reuse,
    breaks, break tokens, saved USD (prices from Hermes through a port). Claude Code, Codex and OpenCode give the usage
    of each request into the same usage.log that the viewer reads.
+8. `d7c3267`, `ffa7719`, `40160cb`: cache writes beside the ACE acts. Each act (pass, keep, fold, ratchet) has
+   acts_, cw_after_, breaks_after_ (sums), cw_per_, break_rate_ (ratios), and fold_cw_share. A request counts once, for
+   its act of highest rank (fold > ratchet > keep > pass). An ace.log line joins the request whose START is at or
+   after it (97.4% of joined lines match the provider's count of the request before; the first join matched 49.4%).
 
 The help text of 41 command forms is byte-equal before and after. A run on a seeded store gave equal results.
 
@@ -82,3 +86,4 @@ The help text of 41 command forms is byte-equal before and after. A run on a see
 - 2026-11-11 15:35 CST: step 6 (`a7ebcf2`) went to common, claude, codex and opencode. The seven suites passed alone on that commit: 162, 7, 928 (19 skipped), 9, 9, 9, 5.
 - 2026-11-11 16:40 CST: OpenCode on this Mac now uses NVIDIA Nemotron (`nemotron-3-ultra-550b-a55b`; small model `nemotron-3.5-lightning-30b-a3b`). Its first sessions gave the OpenCode port its real proof.
 - 2026-11-11 18:25 CST: step 7 (`7e8aece`) went to common, spacegraph, hermes, claude, codex and opencode. The seven suites passed alone on that commit: 174, 7, 932 (19 skipped), 11, 11, 11, 5.
+- 2026-11-11 19:05 CST: step 8 (`40160cb`) went to common, spacegraph and hermes. The seven suites passed alone on that commit: 179, 7, 940 (19 skipped), 11, 11, 11, 5.
