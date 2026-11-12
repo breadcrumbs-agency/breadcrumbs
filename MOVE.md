@@ -41,6 +41,10 @@ Each repository holds one commit with no parent. Its tree is equal to the folder
 6. `cb58a4d`, `6ae5aae`, `6299733`, `a7ebcf2`: the ports. Claude Code, Codex and OpenCode each give a session source
    (`sessions.py`) to the one ingest of common. What two sources share is in common (`breadcrumbs/transcript.py`).
    The measure of repeated code stays 0.
+7. `80eb9ae`, `7e8aece`: metrics. One metric type and one fold in common (`breadcrumbs/metrics.py`); a ratio folds
+   as a ratio of sums. The LLM cache metrics are defined once (`breadcrumbs/usage.py`): hit share, write share, reuse,
+   breaks, break tokens, saved USD (prices from Hermes through a port). Claude Code, Codex and OpenCode give the usage
+   of each request into the same usage.log that the viewer reads.
 
 The help text of 41 command forms is byte-equal before and after. A run on a seeded store gave equal results.
 
@@ -77,3 +81,4 @@ The help text of 41 command forms is byte-equal before and after. A run on a see
 - 2026-11-11 15:25 CST: step 5 (`4da1fb4`) went to common, hermes, claude, codex, opencode and grok. The seven suites passed alone on that commit.
 - 2026-11-11 15:35 CST: step 6 (`a7ebcf2`) went to common, claude, codex and opencode. The seven suites passed alone on that commit: 162, 7, 928 (19 skipped), 9, 9, 9, 5.
 - 2026-11-11 16:40 CST: OpenCode on this Mac now uses NVIDIA Nemotron (`nemotron-3-ultra-550b-a55b`; small model `nemotron-3.5-lightning-30b-a3b`). Its first sessions gave the OpenCode port its real proof.
+- 2026-11-11 18:25 CST: step 7 (`7e8aece`) went to common, spacegraph, hermes, claude, codex and opencode. The seven suites passed alone on that commit: 174, 7, 932 (19 skipped), 11, 11, 11, 5.
