@@ -3,6 +3,7 @@
 
     python tools/bundle.py hermes OUTDIR [--parts DIR]
     python tools/bundle.py claude OUTDIR [--parts DIR]
+    python tools/bundle.py hermes OUTDIR --publish      (also: commit the bundle on the `release` branch of the part and push it)
 
 Why: Hermes installs a plugin from one repository and installs only the PyPI names that its pyproject.toml lists
 (a direct URL is not managed), and Claude Code runs a plugin from one folder. The parts are separate repositories
@@ -119,6 +120,42 @@ def claude(parts, out):
 
 
 BUILDERS = {"hermes": hermes, "claude": claude}
+PART = {"hermes": "breadcrumbs-hermes", "claude": "breadcrumbs-claude"}
+INSTALL = {
+    "hermes": "hermes plugins install breadcrumbs-agency/breadcrumbs-hermes --ref %s",
+    "claude": "/plugin marketplace add breadcrumbs-agency/breadcrumbs-claude#release   (then: /plugin install breadcrumbs@breadcrumbs-agency)",
+}
+
+
+def publish(target, bundle, parts, sources):
+    """Commit the bundle as the next commit of the part's `release` branch and push it. History of the branch is kept:
+    each release is a child of the last (Hermes installs one exact commit; the commit is printed)."""
+    import tempfile
+    origin = subprocess.run(["git", "-C", os.path.join(parts, PART[target]), "remote", "get-url", "origin"],
+                            capture_output=True, text=True, check=True).stdout.strip()
+    with tempfile.TemporaryDirectory(prefix="bundle-release-") as work:
+        def git(*a, check=True):
+            return subprocess.run(["git", "-C", work, "-c", "user.name=breadcrumbs-agency",
+                                   "-c", "user.email=breadcrumbs-agency@users.noreply.github.com", *a],
+                                  capture_output=True, text=True, check=check)
+        cloned = subprocess.run(["git", "clone", "-q", "--branch", "release", "--single-branch", origin, work],
+                                capture_output=True, text=True).returncode == 0
+        if not cloned:
+            git("init", "-q", "-b", "release")
+            git("remote", "add", "origin", origin)
+        for name in os.listdir(work):
+            if name != ".git":
+                path = os.path.join(work, name)
+                shutil.rmtree(path) if os.path.isdir(path) else os.remove(path)
+        shutil.copytree(bundle, work, dirs_exist_ok=True)
+        git("add", "-A")
+        if git("status", "--porcelain").stdout.strip():
+            note = ", ".join("%s %s" % (name, info["commit"][:7]) for name, info in sources.items())
+            git("commit", "-q", "-m", "release: the %s plugin bundle (%s)" % (target, note))
+            git("push", "-q", "origin", "release")
+        sha = git("rev-parse", "HEAD").stdout.strip()
+    print("published %s release %s" % (PART[target], sha))
+    print("install:  " + INSTALL[target] % sha if target == "hermes" else "install:  " + INSTALL[target])
 
 
 def main(argv=None):
@@ -126,6 +163,7 @@ def main(argv=None):
     ap.add_argument("target", choices=sorted(BUILDERS))
     ap.add_argument("out")
     ap.add_argument("--parts", default=os.path.dirname(os.path.dirname(HERE)))
+    ap.add_argument("--publish", action="store_true", help="commit the bundle on the release branch of the part and push")
     args = ap.parse_args(argv)
     out = os.path.abspath(args.out)
     if os.path.exists(out) and os.listdir(out):
@@ -140,6 +178,10 @@ def main(argv=None):
         print("  %-24s %s%s" % (name, info["commit"][:8], "" if info["clean"] else "  (tree not clean)"))
     if dirty:
         print("bundle: not clean: %s" % ", ".join(dirty), file=sys.stderr)
+    if args.publish:
+        if dirty:
+            sys.exit("bundle: not publishing from a tree that is not clean")
+        publish(args.target, out, os.path.abspath(args.parts), sources)
 
 
 if __name__ == "__main__":
