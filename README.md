@@ -14,6 +14,7 @@ lower part by name. No part holds a copy of the code of another part.
 | [breadcrumbs-codex](https://github.com/breadcrumbs-agency/breadcrumbs-codex) | `breadcrumbs_codex` | the adapter for Codex | common |
 | [breadcrumbs-opencode](https://github.com/breadcrumbs-agency/breadcrumbs-opencode) | `breadcrumbs_opencode` | the adapter for OpenCode | common |
 | [breadcrumbs-grok](https://github.com/breadcrumbs-agency/breadcrumbs-grok) | `breadcrumbs_grok` | the adapter for Grok CLI | common |
+| [breadcrumbs-pi](https://github.com/breadcrumbs-agency/breadcrumbs-pi) (private for now) | `breadcrumbs_pi` | the adapter for Pi | common |
 
 ## Get all parts
 
