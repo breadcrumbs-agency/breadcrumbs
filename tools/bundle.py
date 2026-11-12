@@ -108,6 +108,13 @@ def claude(parts, out):
     common = os.path.join(parts, "breadcrumbs-common")
     shutil.copytree(root, out, ignore=SKIP, dirs_exist_ok=True)
     copy_package(common, "breadcrumbs", out)
+    # The bundle is also a one-plugin marketplace: /plugin marketplace add breadcrumbs-agency/breadcrumbs-claude#release
+    with open(os.path.join(out, ".claude-plugin", "marketplace.json"), "w", encoding="utf-8") as f:
+        json.dump({"name": "breadcrumbs-agency", "owner": {"name": "breadcrumbs-agency"},
+                   "plugins": [{"name": "breadcrumbs", "source": "./",
+                                "description": "Content-addressed memory for Claude Code (MCP server: find, open, zoom, trail)."}]},
+                  f, indent=2)
+        f.write("\n")
     return {"breadcrumbs-claude": head(root), "breadcrumbs-common": head(common)}
 
 
