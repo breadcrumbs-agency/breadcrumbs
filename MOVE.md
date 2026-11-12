@@ -90,3 +90,4 @@ The help text of 41 command forms is byte-equal before and after. A run on a see
 - 2026-11-11 18:25 CST: step 7 (`7e8aece`) went to common, spacegraph, hermes, claude, codex and opencode. The seven suites passed alone on that commit: 174, 7, 932 (19 skipped), 11, 11, 11, 5.
 - 2026-11-11 19:05 CST: step 8 (`40160cb`) went to common, spacegraph and hermes. The seven suites passed alone on that commit: 179, 7, 940 (19 skipped), 11, 11, 11, 5.
 - 2026-11-11 19:12 CST: step 9 (`8fed1f7`) went to common, spacegraph and hermes. The seven suites passed alone on that commit: 179, 7, 941 (19 skipped), 11, 11, 11, 5.
+- 2026-11-11 19:30 CST: `breadcrumbs-common` runs its suite on GitHub Actions on each push (`.github/workflows/suite.yml`); the first run passed. The other six parts have no workflow yet: the org disallows deploy keys, so a run there cannot fetch the private parts below it.
