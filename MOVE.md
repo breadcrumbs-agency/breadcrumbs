@@ -49,6 +49,8 @@ Each repository holds one commit with no parent. Its tree is equal to the folder
    acts_, cw_after_, breaks_after_ (sums), cw_per_, break_rate_ (ratios), and fold_cw_share. A request counts once, for
    its act of highest rank (fold > ratchet > keep > pass). An ace.log line joins the request whose START is at or
    after it (97.4% of joined lines match the provider's count of the request before; the first join matched 49.4%).
+9. `8fed1f7`: the viewer's request axis takes its pairs from that one join (it had a second pairing by the end
+   stamp: 35.4% of its slots right, now 97.4%). The totals of the ace measures did not change; only their slots moved.
 
 The help text of 41 command forms is byte-equal before and after. A run on a seeded store gave equal results.
 
@@ -87,3 +89,4 @@ The help text of 41 command forms is byte-equal before and after. A run on a see
 - 2026-11-11 16:40 CST: OpenCode on this Mac now uses NVIDIA Nemotron (`nemotron-3-ultra-550b-a55b`; small model `nemotron-3.5-lightning-30b-a3b`). Its first sessions gave the OpenCode port its real proof.
 - 2026-11-11 18:25 CST: step 7 (`7e8aece`) went to common, spacegraph, hermes, claude, codex and opencode. The seven suites passed alone on that commit: 174, 7, 932 (19 skipped), 11, 11, 11, 5.
 - 2026-11-11 19:05 CST: step 8 (`40160cb`) went to common, spacegraph and hermes. The seven suites passed alone on that commit: 179, 7, 940 (19 skipped), 11, 11, 11, 5.
+- 2026-11-11 19:12 CST: step 9 (`8fed1f7`) went to common, spacegraph and hermes. The seven suites passed alone on that commit: 179, 7, 941 (19 skipped), 11, 11, 11, 5.
