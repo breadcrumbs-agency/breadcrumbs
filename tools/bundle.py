@@ -3,11 +3,12 @@
 
     python tools/bundle.py hermes OUTDIR [--parts DIR]
     python tools/bundle.py claude OUTDIR [--parts DIR]
+    python tools/bundle.py codex OUTDIR [--parts DIR]
     python tools/bundle.py hermes OUTDIR --publish      (also: commit the bundle on the `release` branch of the part and push it)
 
 Why: Hermes installs a plugin from one repository and installs only the PyPI names that its pyproject.toml lists
-(a direct URL is not managed), and Claude Code runs a plugin from one folder. The parts are separate repositories
-(common, spacegraph, hermes, claude), so a plugin cannot import its layers from them. The bundle is the plugin folder
+(a direct URL is not managed), and Claude Code and Codex run a plugin from one folder. The parts are separate
+repositories (common, spacegraph, hermes, claude, codex), so a plugin cannot import its layers from them. The bundle is the plugin folder
 with the layers it needs copied under `lib/`, and a first line in `__init__.py` that puts `lib/` on `sys.path`.
 The source stays in the parts; a bundle is generated, never edited (a file `BUNDLE.json` says from which commits).
 
@@ -121,11 +122,23 @@ def claude(parts, out):
             "breadcrumbs-spacegraph": head(os.path.join(parts, "breadcrumbs-spacegraph"))}
 
 
-BUILDERS = {"hermes": hermes, "claude": claude}
-PART = {"hermes": "breadcrumbs-hermes", "claude": "breadcrumbs-claude"}
+def codex(parts, out):
+    """The Codex plugin folder with its layers under lib/: bin/bc-mcp, bin/bc-ace and hooks/bridge.py put lib/ on the
+    path. The folder is its own local marketplace (.agents/plugins/marketplace.json)."""
+    root = os.path.join(parts, "breadcrumbs-codex")
+    common, spacegraph = (os.path.join(parts, name) for name in ("breadcrumbs-common", "breadcrumbs-spacegraph"))
+    shutil.copytree(root, out, ignore=SKIP, dirs_exist_ok=True)
+    copy_package(common, "breadcrumbs", out)
+    copy_package(spacegraph, "breadcrumbs_spacegraph", out)  # the explorer: `breadcrumbs open` and `viz`
+    return {"breadcrumbs-codex": head(root), "breadcrumbs-common": head(common), "breadcrumbs-spacegraph": head(spacegraph)}
+
+
+BUILDERS = {"hermes": hermes, "claude": claude, "codex": codex}
+PART = {"hermes": "breadcrumbs-hermes", "claude": "breadcrumbs-claude", "codex": "breadcrumbs-codex"}
 INSTALL = {
     "hermes": "hermes plugins install breadcrumbs-agency/breadcrumbs-hermes --ref %s",
     "claude": "/plugin marketplace add breadcrumbs-agency/breadcrumbs-claude#release   (then: /plugin install breadcrumbs@breadcrumbs-agency)",
+    "codex": "codex plugin marketplace add DIR   (DIR: a clone of the release branch; then: codex plugin add breadcrumbs@breadcrumbs-local)",
 }
 
 
