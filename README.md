@@ -11,6 +11,7 @@ lower part by name. No part holds a copy of the code of another part.
 | [breadcrumbs-spacegraph](https://github.com/breadcrumbs-agency/breadcrumbs-spacegraph) | `breadcrumbs_spacegraph` | the viewers: explorer page, terminal views | common |
 | [breadcrumbs-hermes](https://github.com/breadcrumbs-agency/breadcrumbs-hermes) | `breadcrumbs_hermes` | the Hermes plugin: memory provider, ACE, islands, the usage log | common, spacegraph |
 | [breadcrumbs-claude](https://github.com/breadcrumbs-agency/breadcrumbs-claude) | `breadcrumbs_claude` | the adapter for Claude Code | common |
+| [breadcrumbs-claude-api](https://github.com/breadcrumbs-agency/breadcrumbs-claude-api) (private) | `breadcrumbs_claude` | breadcrumbs-claude and the Claude API side: the Claude ACE adapter and the fold hook | common |
 | [breadcrumbs-codex](https://github.com/breadcrumbs-agency/breadcrumbs-codex) | `breadcrumbs_codex` | the adapter for Codex | common |
 | [breadcrumbs-opencode](https://github.com/breadcrumbs-agency/breadcrumbs-opencode) | `breadcrumbs_opencode` | the adapter for OpenCode | common |
 | [breadcrumbs-grok](https://github.com/breadcrumbs-agency/breadcrumbs-grok) | `breadcrumbs_grok` | the adapter for Grok CLI | common |
