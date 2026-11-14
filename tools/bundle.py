@@ -133,12 +133,24 @@ def codex(parts, out):
     return {"breadcrumbs-codex": head(root), "breadcrumbs-common": head(common), "breadcrumbs-spacegraph": head(spacegraph)}
 
 
-BUILDERS = {"hermes": hermes, "claude": claude, "codex": codex}
-PART = {"hermes": "breadcrumbs-hermes", "claude": "breadcrumbs-claude", "codex": "breadcrumbs-codex"}
+def pi(parts, out):
+    """The Pi package folder with its layers under lib/: extensions/breadcrumbs-sync.ts puts lib/ (the folder above
+    extensions/) on the PYTHONPATH of the `python -m breadcrumbs sync pi` that it spawns."""
+    root = os.path.join(parts, "breadcrumbs-pi")
+    common, spacegraph = (os.path.join(parts, name) for name in ("breadcrumbs-common", "breadcrumbs-spacegraph"))
+    shutil.copytree(root, out, ignore=SKIP, dirs_exist_ok=True)
+    copy_package(common, "breadcrumbs", out)
+    copy_package(spacegraph, "breadcrumbs_spacegraph", out)  # the explorer: `breadcrumbs open` and `viz`
+    return {"breadcrumbs-pi": head(root), "breadcrumbs-common": head(common), "breadcrumbs-spacegraph": head(spacegraph)}
+
+
+BUILDERS = {"hermes": hermes, "claude": claude, "codex": codex, "pi": pi}
+PART = {"hermes": "breadcrumbs-hermes", "claude": "breadcrumbs-claude", "codex": "breadcrumbs-codex", "pi": "breadcrumbs-pi"}
 INSTALL = {
     "hermes": "hermes plugins install breadcrumbs-agency/breadcrumbs-hermes --ref %s",
     "claude": "/plugin marketplace add breadcrumbs-agency/breadcrumbs-claude#release   (then: /plugin install breadcrumbs@breadcrumbs-agency)",
     "codex": "codex plugin marketplace add DIR   (DIR: a clone of the release branch; then: codex plugin add breadcrumbs@breadcrumbs-local)",
+    "pi": "pi install DIR   (DIR: a clone of the release branch)",
 }
 
 
