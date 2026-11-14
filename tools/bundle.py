@@ -64,6 +64,8 @@ def hermes(parts, out):
     root = os.path.join(parts, "breadcrumbs-hermes")
     common, spacegraph = (os.path.join(parts, name) for name in ("breadcrumbs-common", "breadcrumbs-spacegraph"))
     shutil.copytree(root, out, ignore=SKIP, dirs_exist_ok=True)
+    for pages in ("doc", "docs"):  # the project's pages and films are not plugin code (and a film's data trips Hermes's install scan)
+        shutil.rmtree(os.path.join(out, pages), ignore_errors=True)
     copy_package(common, "breadcrumbs", out)
     copy_package(spacegraph, "breadcrumbs_spacegraph", out)
     entry = os.path.join(out, "__init__.py")

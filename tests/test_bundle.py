@@ -12,6 +12,24 @@ HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PARTS = os.path.dirname(HERE)
 
 
+class HermesBundle(unittest.TestCase):
+    def test_the_pages_and_films_of_the_part_are_not_in_the_bundle(self):
+        """doc/ and docs/ are the project's pages: not plugin code, and one film's data (622 KB of hashes) makes Hermes's
+        install scan answer "dangerous", which --force does not override."""
+        for part in ("breadcrumbs-hermes", "breadcrumbs-common", "breadcrumbs-spacegraph"):
+            if not os.path.isdir(os.path.join(PARTS, part)):
+                self.skipTest("no %s beside this repository" % part)
+        with tempfile.TemporaryDirectory() as tmp:
+            out = os.path.join(tmp, "bundle")
+            done = subprocess.run([sys.executable, os.path.join(HERE, "tools", "bundle.py"), "hermes", out],
+                                  capture_output=True, text=True, timeout=120)
+            self.assertEqual(done.returncode, 0, done.stderr[-400:])
+            self.assertTrue(os.path.isfile(os.path.join(out, "plugin.yaml")))
+            for pages in ("doc", "docs"):
+                self.assertFalse(os.path.exists(os.path.join(out, pages)), pages)
+            self.assertTrue(os.path.isfile(os.path.join(out, "lib", "breadcrumbs_spacegraph", "qr.py")))
+
+
 class CodexBundle(unittest.TestCase):
     def setUp(self):
         for part in ("breadcrumbs-codex", "breadcrumbs-common", "breadcrumbs-spacegraph"):
