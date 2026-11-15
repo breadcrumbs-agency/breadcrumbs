@@ -4,7 +4,7 @@
     python tools/bundle.py hermes OUTDIR [--parts DIR]
     python tools/bundle.py claude OUTDIR [--parts DIR]
     python tools/bundle.py codex OUTDIR [--parts DIR]
-    python tools/bundle.py hermes OUTDIR --publish      (also: commit the bundle on the `release` branch of the part and push it)
+    python tools/bundle.py hermes OUTDIR --publish      (also: commit the bundle on the release branch and push it: for hermes the repository breadcrumbs-hermes-release, for the others the `release` branch of the part)
 
 Why: Hermes installs a plugin from one repository and installs only the PyPI names that its pyproject.toml lists
 (a direct URL is not managed), and Claude Code and Codex run a plugin from one folder. The parts are separate
@@ -149,28 +149,37 @@ def pi(parts, out):
 BUILDERS = {"hermes": hermes, "claude": claude, "codex": codex, "pi": pi}
 PART = {"hermes": "breadcrumbs-hermes", "claude": "breadcrumbs-claude", "codex": "breadcrumbs-codex", "pi": "breadcrumbs-pi"}
 INSTALL = {
-    "hermes": "hermes plugins install breadcrumbs-agency/breadcrumbs-hermes --ref %s",
+    "hermes": "hermes plugins install breadcrumbs-agency/breadcrumbs-hermes-release --ref %s",
     "claude": "/plugin marketplace add breadcrumbs-agency/breadcrumbs-claude#release   (then: /plugin install breadcrumbs@breadcrumbs-agency)",
     "codex": "codex plugin marketplace add DIR   (DIR: a clone of the release branch; then: codex plugin add breadcrumbs@breadcrumbs-local)",
     "pi": "pi install DIR   (DIR: a clone of the release branch)",
 }
 
 
+# A target whose bundle has a repository of its own (the packaging that Nous Research installs): the repository, and
+# its branch. No other repository holds it: the bundle shares no history with the source of the part.
+RELEASE_REPO = {"hermes": ("breadcrumbs-hermes-release", "master")}
+
+
 def publish(target, bundle, parts, sources):
-    """Commit the bundle as the next commit of the part's `release` branch and push it. History of the branch is kept:
-    each release is a child of the last (Hermes installs one exact commit; the commit is printed)."""
+    """Commit the bundle as the next commit of the release branch and push it: the `release` branch of the part, or,
+    for a target in RELEASE_REPO, the branch of the repository of its own. History is kept: each release is a child of
+    the last (Hermes installs one exact commit; the commit is printed)."""
     import tempfile
     origin = subprocess.run(["git", "-C", os.path.join(parts, PART[target]), "remote", "get-url", "origin"],
                             capture_output=True, text=True, check=True).stdout.strip()
+    repo, branch = RELEASE_REPO.get(target, (None, "release"))
+    if repo:  # the same owner and address form as the part's origin, the name of the repository changed
+        origin = origin.rsplit("/", 1)[0] + "/" + repo + (".git" if origin.endswith(".git") else "")
     with tempfile.TemporaryDirectory(prefix="bundle-release-") as work:
         def git(*a, check=True):
             return subprocess.run(["git", "-C", work, "-c", "user.name=breadcrumbs-agency",
                                    "-c", "user.email=breadcrumbs-agency@users.noreply.github.com", *a],
                                   capture_output=True, text=True, check=check)
-        cloned = subprocess.run(["git", "clone", "-q", "--branch", "release", "--single-branch", origin, work],
+        cloned = subprocess.run(["git", "clone", "-q", "--branch", branch, "--single-branch", origin, work],
                                 capture_output=True, text=True).returncode == 0
         if not cloned:
-            git("init", "-q", "-b", "release")
+            git("init", "-q", "-b", branch)
             git("remote", "add", "origin", origin)
         for name in os.listdir(work):
             if name != ".git":
@@ -181,9 +190,9 @@ def publish(target, bundle, parts, sources):
         if git("status", "--porcelain").stdout.strip():
             note = ", ".join("%s %s" % (name, info["commit"][:7]) for name, info in sources.items())
             git("commit", "-q", "-m", "release: the %s plugin bundle (%s)" % (target, note))
-            git("push", "-q", "origin", "release")
+            git("push", "-q", "origin", branch)
         sha = git("rev-parse", "HEAD").stdout.strip()
-    print("published %s release %s" % (PART[target], sha))
+    print("published %s release %s" % (repo or PART[target], sha))
     print("install:  " + INSTALL[target] % sha if target == "hermes" else "install:  " + INSTALL[target])
 
 
@@ -192,7 +201,7 @@ def main(argv=None):
     ap.add_argument("target", choices=sorted(BUILDERS))
     ap.add_argument("out")
     ap.add_argument("--parts", default=os.path.dirname(os.path.dirname(HERE)))
-    ap.add_argument("--publish", action="store_true", help="commit the bundle on the release branch of the part and push")
+    ap.add_argument("--publish", action="store_true", help="commit the bundle on its release branch (hermes: its own repository) and push")
     args = ap.parse_args(argv)
     out = os.path.abspath(args.out)
     if os.path.exists(out) and os.listdir(out):
