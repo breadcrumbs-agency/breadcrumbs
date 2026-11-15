@@ -1,0 +1,43 @@
+{
+  "about": "The lanes of the dispatch skill: one source for the table of each model family, the Claude Code agents, the Codex lane profiles and the Hermes lane routes. tools/skills.py renders them; a copy is generated, never edited.",
+  "lanes": {
+    "lead": {"verbs": ["orchestrate"], "role": "One model leads and briefs: it writes one brief per task, collects the reports and decides."},
+    "build": {"verbs": ["pinpoint", "scaffold"], "top": true, "role": "pinpoint: return the smallest set of exact addresses (id:a-b at level 1, file and line), not a description of them. scaffold: lay down the files, signatures and failing tests, so that each cheap-lane task is one item with one test."},
+    "cheap": {"verbs": ["dispatch", "fan-out"], "role": "One task, one brief, one test for done. Make no design choice: a question goes back to the lead."},
+    "check": {"verbs": ["inspect", "validate", "trim"], "top": true, "role": "Read before you cut. inspect: open every quote of a report and read the diff. validate: run the brief's test for done and write pass or fail with the ids. trim: cut what the brief did not ask for. Build nothing new: a failure goes back to the cheap lane with the failing quote."}
+  },
+  "families": {
+    "claude": {
+      "title": "Claude",
+      "hermes_provider": "anthropic",
+      "lanes": {
+        "lead": {"model": "claude-sonnet-5-5", "effort": "medium"},
+        "build": {"model": "claude-fable-5-2", "effort": "max"},
+        "cheap": {"model": "claude-haiku-5-5", "effort": "low"},
+        "check": {"model": "claude-opus-5-5", "effort": "high"}
+      }
+    },
+    "gpt": {
+      "title": "GPT",
+      "hermes_provider": "openai-codex",
+      "lanes": {
+        "lead": {"model": "gpt-6.1-terra", "effort": "medium"},
+        "build": {"model": "gpt-6-astra", "effort": "ultra"},
+        "cheap": {"model": "gpt-6-luna", "effort": "low"},
+        "check": {"model": "gpt-6.1-sol", "effort": "high"}
+      }
+    },
+    "nvidia": {
+      "title": "NVIDIA",
+      "hermes_provider": "nvidia",
+      "lanes": {
+        "lead": {"model": "nvidia/nemotron-3-super-120b-a12b", "effort": "medium"},
+        "build": {"model": "nvidia/nemotron-3-ultra-550b-a55b", "effort": "high"},
+        "cheap": {"model": "nvidia/nemotron-3.5-lightning-30b-a3b", "effort": "low",
+                  "also": [{"model": "z-ai/glm-5.3-flash", "provider": "openrouter"},
+                           {"model": "deepseek/deepseek-v4.1-flash", "provider": "openrouter"}]},
+        "check": {"model": "nvidia/nemotron-3-ultra-550b-a55b", "effort": "high"}
+      }
+    }
+  }
+}
