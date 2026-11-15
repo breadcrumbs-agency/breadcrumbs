@@ -94,7 +94,7 @@ def hermes(parts, out):
             "[tool.setuptools]\n"
             'packages = ["breadcrumbs_hermes"]\n\n'
             "[tool.setuptools.package-data]\n"
-            'breadcrumbs_hermes = ["skills/*/SKILL.md"]\n' % version(root))
+            'breadcrumbs_hermes = ["skills/*/SKILL.md", "icon.png"]\n' % version(root))
     return {"breadcrumbs-hermes": head(root), "breadcrumbs-common": head(common),
             "breadcrumbs-spacegraph": head(spacegraph)}
 

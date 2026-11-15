@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import tomllib
 import unittest
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,6 +29,22 @@ class HermesBundle(unittest.TestCase):
             for pages in ("doc", "docs"):
                 self.assertFalse(os.path.exists(os.path.join(out, pages)), pages)
             self.assertTrue(os.path.isfile(os.path.join(out, "lib", "breadcrumbs_spacegraph", "qr.py")))
+
+    def test_the_harness_icon_is_in_the_bundle_and_declared_as_package_data(self):
+        """The harness adapter reads its icon beside the package, including from a generated release bundle."""
+        for part in ("breadcrumbs-hermes", "breadcrumbs-common", "breadcrumbs-spacegraph"):
+            if not os.path.isdir(os.path.join(PARTS, part)):
+                self.skipTest("no %s beside this repository" % part)
+        with tempfile.TemporaryDirectory() as tmp:
+            out = os.path.join(tmp, "bundle")
+            done = subprocess.run([sys.executable, os.path.join(HERE, "tools", "bundle.py"), "hermes", out],
+                                  capture_output=True, text=True, timeout=120)
+            self.assertEqual(done.returncode, 0, done.stderr[-400:])
+            icon = os.path.join(out, "breadcrumbs_hermes", "icon.png")
+            self.assertTrue(os.path.isfile(icon))
+            with open(os.path.join(out, "pyproject.toml"), "rb") as f:
+                package_data = tomllib.load(f)["tool"]["setuptools"]["package-data"]["breadcrumbs_hermes"]
+            self.assertIn("icon.png", package_data)
 
 
 class CodexBundle(unittest.TestCase):
