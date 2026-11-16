@@ -47,6 +47,35 @@ class HermesBundle(unittest.TestCase):
             self.assertIn("icon.png", package_data)
 
 
+class ClaudeApiBundle(unittest.TestCase):
+    """The private API side builds as the Claude plugin folder with lib/, and --publish refuses (no release repository)."""
+
+    def setUp(self):
+        for part in ("breadcrumbs-claude-api", "breadcrumbs-common", "breadcrumbs-spacegraph"):
+            if not os.path.isdir(os.path.join(PARTS, part)):
+                self.skipTest("no %s beside this repository" % part)
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.out = os.path.join(tmp.name, "bundle")
+        self.done = subprocess.run([sys.executable, os.path.join(HERE, "tools", "bundle.py"), "claude-api", self.out],
+                                   capture_output=True, text=True, timeout=120)
+
+    def test_the_bundle_has_the_plugin_the_layers_and_the_proxy(self):
+        self.assertEqual(self.done.returncode, 0, self.done.stderr[-400:])
+        for rel in (".claude-plugin/plugin.json", "bin/bc-proxy", "bin/bc-fold", "breadcrumbs_proxy/proxy.py",
+                    "breadcrumbs_claude/ace_adapter.py", "lib/breadcrumbs/ace_core.py", "BUNDLE.json"):
+            self.assertTrue(os.path.isfile(os.path.join(self.out, rel)), rel)
+        with open(os.path.join(self.out, "BUNDLE.json"), encoding="utf-8") as f:
+            self.assertEqual(json.load(f)["target"], "claude-api")
+
+    def test_publish_refuses_until_a_release_repository_is_configured(self):
+        self.assertEqual(self.done.returncode, 0, self.done.stderr[-400:])
+        done = subprocess.run([sys.executable, os.path.join(HERE, "tools", "bundle.py"), "claude-api",
+                               self.out + "-pub", "--publish"], capture_output=True, text=True, timeout=120)
+        self.assertNotEqual(done.returncode, 0)
+        self.assertIn("no release repository configured", done.stderr)
+
+
 class CodexBundle(unittest.TestCase):
     def setUp(self):
         for part in ("breadcrumbs-codex", "breadcrumbs-common", "breadcrumbs-spacegraph"):

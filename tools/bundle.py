@@ -3,6 +3,7 @@
 
     python tools/bundle.py hermes OUTDIR [--parts DIR]
     python tools/bundle.py claude OUTDIR [--parts DIR]
+    python tools/bundle.py claude-api OUTDIR [--parts DIR]   (private: --publish refuses until a release repository is configured)
     python tools/bundle.py codex OUTDIR [--parts DIR]
     python tools/bundle.py hermes OUTDIR --publish      (also: commit the bundle on the release branch and push it: for hermes the repository breadcrumbs-hermes-release, for the others the `release` branch of the part)
 
@@ -107,8 +108,9 @@ def version(part):
     return "0.0.0"
 
 
-def claude(parts, out):
-    root = os.path.join(parts, "breadcrumbs-claude")
+def claude(parts, out, part="breadcrumbs-claude"):
+    """The Claude Code plugin folder of `part` (breadcrumbs-claude, or the private breadcrumbs-claude-api) with lib/."""
+    root = os.path.join(parts, part)
     common = os.path.join(parts, "breadcrumbs-common")
     shutil.copytree(root, out, ignore=SKIP, dirs_exist_ok=True)
     copy_package(common, "breadcrumbs", out)
@@ -120,8 +122,13 @@ def claude(parts, out):
                                 "description": "Content-addressed memory for Claude Code, one memory for each project (MCP server: find, open, zoom, trail; /breadcrumbs:viz)."}]},
                   f, indent=2)
         f.write("\n")
-    return {"breadcrumbs-claude": head(root), "breadcrumbs-common": head(common),
+    return {part: head(root), "breadcrumbs-common": head(common),
             "breadcrumbs-spacegraph": head(os.path.join(parts, "breadcrumbs-spacegraph"))}
+
+
+def claude_api(parts, out):
+    """The private API side (breadcrumbs-claude-api: ACE, the fold hook, bin/bc-proxy): the claude bundle of that folder."""
+    return claude(parts, out, "breadcrumbs-claude-api")
 
 
 def codex(parts, out):
@@ -146,11 +153,16 @@ def pi(parts, out):
     return {"breadcrumbs-pi": head(root), "breadcrumbs-common": head(common), "breadcrumbs-spacegraph": head(spacegraph)}
 
 
-BUILDERS = {"hermes": hermes, "claude": claude, "codex": codex, "pi": pi}
-PART = {"hermes": "breadcrumbs-hermes", "claude": "breadcrumbs-claude", "codex": "breadcrumbs-codex", "pi": "breadcrumbs-pi"}
+BUILDERS = {"hermes": hermes, "claude": claude, "claude-api": claude_api, "codex": codex, "pi": pi}
+PART = {"hermes": "breadcrumbs-hermes", "claude": "breadcrumbs-claude", "claude-api": "breadcrumbs-claude-api",
+        "codex": "breadcrumbs-codex", "pi": "breadcrumbs-pi"}
+# A private target: its bundle has no repository yet. --publish refuses until one is configured (the user's rule: a separate
+# packaging is a separate repository).
+PRIVATE = {"claude-api"}
 INSTALL = {
     "hermes": "hermes plugins install breadcrumbs-agency/breadcrumbs-hermes-release --ref %s",
     "claude": "/plugin marketplace add breadcrumbs-agency/breadcrumbs-claude#release   (then: /plugin install breadcrumbs@breadcrumbs-agency)",
+    "claude-api": "/plugin marketplace add DIR   (DIR: the bundle folder; no release repository yet; then: /plugin install breadcrumbs@breadcrumbs-agency)",
     "codex": "codex plugin marketplace add DIR   (DIR: a clone of the release branch; then: codex plugin add breadcrumbs@breadcrumbs-local)",
     "pi": "pi install DIR   (DIR: a clone of the release branch)",
 }
@@ -217,6 +229,9 @@ def main(argv=None):
     if dirty:
         print("bundle: not clean: %s" % ", ".join(dirty), file=sys.stderr)
     if args.publish:
+        if args.target in PRIVATE:
+            sys.exit("bundle: %s is private and has no release repository configured; not publishing. The bundle is in %s"
+                     % (args.target, out))
         if dirty:
             sys.exit("bundle: not publishing from a tree that is not clean")
         publish(args.target, out, os.path.abspath(args.parts), sources)
