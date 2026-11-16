@@ -153,9 +153,20 @@ def pi(parts, out):
     return {"breadcrumbs-pi": head(root), "breadcrumbs-common": head(common), "breadcrumbs-spacegraph": head(spacegraph)}
 
 
-BUILDERS = {"hermes": hermes, "claude": claude, "claude-api": claude_api, "codex": codex, "pi": pi}
+def opencode(parts, out):
+    """The OpenCode plugin folder with its layers under lib/: plugin/ and bin/bc-python (which puts lib/ on the path).
+    The folder is loaded by listing it in `plugins` of opencode.json."""
+    root = os.path.join(parts, "breadcrumbs-opencode")
+    common, spacegraph = (os.path.join(parts, name) for name in ("breadcrumbs-common", "breadcrumbs-spacegraph"))
+    shutil.copytree(root, out, ignore=SKIP, dirs_exist_ok=True)
+    copy_package(common, "breadcrumbs", out)
+    copy_package(spacegraph, "breadcrumbs_spacegraph", out)  # the explorer: `/viz` and `viz`
+    return {"breadcrumbs-opencode": head(root), "breadcrumbs-common": head(common), "breadcrumbs-spacegraph": head(spacegraph)}
+
+
+BUILDERS = {"hermes": hermes, "claude": claude, "claude-api": claude_api, "codex": codex, "pi": pi, "opencode": opencode}
 PART = {"hermes": "breadcrumbs-hermes", "claude": "breadcrumbs-claude", "claude-api": "breadcrumbs-claude-api",
-        "codex": "breadcrumbs-codex", "pi": "breadcrumbs-pi"}
+        "codex": "breadcrumbs-codex", "pi": "breadcrumbs-pi", "opencode": "breadcrumbs-opencode"}
 # A private target: its bundle has no repository yet. --publish refuses until one is configured (the user's rule: a separate
 # packaging is a separate repository).
 PRIVATE = {"claude-api"}
@@ -165,6 +176,7 @@ INSTALL = {
     "claude-api": "/plugin marketplace add DIR   (DIR: the bundle folder; no release repository yet; then: /plugin install breadcrumbs@breadcrumbs-agency)",
     "codex": "codex plugin marketplace add DIR   (DIR: a clone of the release branch; then: codex plugin add breadcrumbs@breadcrumbs-local)",
     "pi": "pi install DIR   (DIR: a clone of the release branch)",
+    "opencode": "add the folder to opencode.json: \"plugins\": [\"DIR\"]   (DIR: the bundle folder, with lib/)",
 }
 
 
